@@ -83,7 +83,6 @@ class WooCowpay
 		$this->load_dependencies();
 		$this->set_locale();
 		$this->handleThankyouPage();
-		// $this->handleOtpRedirectPage();
 		$this->define_admin_hooks();
 		$this->define_public_hooks();
 	}
@@ -181,20 +180,6 @@ class WooCowpay
 
 	}
 
-	// private function handleOtpRedirectPage(){
-
-	// 	if ( ! session_id() ) {
-	// 		session_start();
-	// 	}
-		
-    //     if ( isset($_SESSION['CreditCardDetails']) ) {
-
-    //         $this->loader->add_filter('woocommerce_otpPage_redirect', $this, 'woo_title_otp_redirect_page');
-
-    //     }
-
-	// }
-
 	function woo_title_order_received() {
 		
 		if ( ! session_id() ) {
@@ -215,21 +200,9 @@ class WooCowpay
 		//Credit Card  OTP
         if (isset($_SESSION['creditCard'])) {
 
-			$currentPage = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-			$_SESSION['orderNumber'] = $_SESSION['creditCard']->data->orderNumber;
 			echo $_SESSION['creditCard']->data->html;
 			unset($_SESSION['creditCard']);
-			// die;
-			//if isset(callback response) && response == 200{
-				// $title = "Operation Done Successfully.<br>Please use the following reference number 
-				// <b>".$_SESSION['orderNumber']."</b> to Follow Your Transaction";
-				//return $title
-			//}else if (if isset(callback response) && response == 200) 
-				// $title = "Operation Failed";
-				//return $title
-			//else{
-				//call function until reply
-			//} 
+			
 		}
 
     }

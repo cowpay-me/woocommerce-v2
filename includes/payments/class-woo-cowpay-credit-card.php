@@ -42,7 +42,7 @@ class WC_Payment_Gateway_Cowpay_CC extends WC_Payment_Gateway_Cowpay
         // when this url is entered, an action is called from WooCommerce => woocommerce_api_<class_name>
         $this->notify_url = WC()->api_request_url('WC_Payment_Gateway_Cowpay_CC');
         // we then register our otp response check for this action, and call $this->check_otp_response()
-        add_action('wp_ajax_check_otp_response', array($this, 'check_otp_response'));
+        //add_action('wp_ajax_check_otp_response', array($this, 'check_otp_response'));
         // add_action('wp_enqueue_scripts','check_otp_response');
 
         parent::init();
@@ -259,22 +259,30 @@ class WC_Payment_Gateway_Cowpay_CC extends WC_Payment_Gateway_Cowpay
             $this->set_cowpay_meta($customer_order, $request_params, $response);
 
             // display to the admin
-            $customer_order->add_order_note(__($response->operationMessage));            
-            // if (isset($response->token) && $response->token == true) {
-            //     WC()->session->set( 'tansaction_id' , $response->token );
+            $customer_order->add_order_note(__($response->operationMessage));      
+
+            //redirect to OTP Page
+            // if (isset($response->data->html) && !empty($response->data->html)) {
+            //     WC()->session->set('return_url', $_SESSION['return_url']);
+            //     echo $_SESSION['creditCard']->data->html;
+            //     unset($_SESSION['creditCard']);
+            //     //WC()->session->set('otp_iframe' , $response->data->html );
+            //     // wp_safe_redirect(woo_cowpay_view("custom-otp-page"));
+            //     // die;
             //     // TODO: add option to use OTP plugin when return_url is not exist
-            //     $res = array(
-            //         'result' => 'success',
-            //         'redirect' =>  $this->get_transaction_url($customer_order)
-            //     );
-            //     return $res;
+            //     // $res = array(
+            //     //     'result' => 'success',
+            //     //     'redirect' =>  $this->get_transaction_url($customer_order)
+            //     // );
+            //     // return $res;
             // }
 
             // not 3DS:
-
             if ( ! session_id() ) {
                 session_start();
             }
+
+            WC()->session->set('return_url', $_SESSION['return_url']);
 
             $_SESSION['creditCard'] = $response;// array
 
@@ -369,18 +377,24 @@ class WC_Payment_Gateway_Cowpay_CC extends WC_Payment_Gateway_Cowpay
         // wp_enqueue_script('cowpay_otp_js', "$schema://$host/js/plugins/OTPPaymentPlugin.js");
         wp_enqueue_script('woo-cowpay', WOO_COWPAY_PLUGIN_URL . 'public/js/woo-cowpay-public.js');
 
+        wp_enqueue_script('iframe-cowpay', WOO_COWPAY_PLUGIN_URL . 'public/js/iframe-popup.js');
+
         wp_enqueue_style('cowpay_public_css', WOO_COWPAY_PLUGIN_URL . 'public/css/woo-cowpay-public.css');
 
         // Pass ajax_url to cowpay_js
         // this line will pass `admin_url('admin-ajax.php')` value to be accessed through
         // plugin_ajax_object.ajax_url in javascipt file with the handle cowpay_js (the one above)
         // wp_localize_script('cowpay_js', 'cowpay_data', array('ajax_url' => admin_url('admin-ajax.php')));
+
         wp_localize_script('woo-cowpay', 'cowpay_data', array(
-            'tansaction_id' => WC()->session->get( 'tansaction_id'),
-            'ajax_url' => WC()->ajax_url(),
+            // 'order_id' => WC()->session->get( 'order_id'),
+            // 'ajax_url' => WC()->ajax_url(),
+            'return_url' =>WC()->session->get('return_url')
             )
         );
-        WC()->session->__unset( 'tansaction_id' );
 
+        WC()->session->__unset('return_url');
     }
+
+   
 }

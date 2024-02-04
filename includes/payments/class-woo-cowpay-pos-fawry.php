@@ -78,6 +78,7 @@ class WC_Payment_Gateway_Cowpay_POS_Fawry extends WC_Payment_Gateway_Cowpay
     public function process_payment($order_id)
     {
                 
+        $dial_phone_number = $this->get_dial_phone_number();
         $customer_order = wc_get_order($order_id);   
         $merchant_ref_id = $this->get_cp_merchant_reference_id($customer_order);
         $customer_profile_id = $this->get_cp_customer_profile_id($customer_order);
@@ -91,7 +92,7 @@ class WC_Payment_Gateway_Cowpay_POS_Fawry extends WC_Payment_Gateway_Cowpay
             "customerMerchantProfileId" => $customer_profile_id,
             "amount" => $amount,
             "signature" => $signature,
-            "customerMobile"  => $customer_order->get_billing_phone(),
+            "customerMobile"  => $dial_phone_number.$customer_order->get_billing_phone(),
             "customerFirstName" => $customer_order->get_formatted_billing_full_name(),
             "customerLastName" => $customer_order->get_formatted_billing_full_name(),
             "customerEmail" => $customer_order->get_billing_email(),
